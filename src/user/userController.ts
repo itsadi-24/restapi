@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from "express";
+import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
 import userModel from "./userModel";
+import { sign } from "jsonwebtoken";
+import { config } from "../config/config";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   //whenever a request comes it undergoes a certain steps
@@ -14,13 +17,26 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
   //db call
   const user = await userModel.findOne({ email: email });
 
+  // checking if user already exists
   if (user) {
     const error = createHttpError(400, "user already exists");
     return next(error);
   }
-  //Process
+  // hashing password
+  const hashedPass = await bcrypt.hash(password, 10);
+
+  const newUser = await userModel.create({
+    name,
+    email,
+    password: hashedPass,
+  });
+  //jwt token generation
+  const token = sign({ sub: newUser._id }, config.jwtsecret as string, {
+    expiresIn: "7d",
+  });
+
   //Response
-  //   res.send("hello user");
+  res.json({ accessToken: token });
 };
 
 export { createUser };
