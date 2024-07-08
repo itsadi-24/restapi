@@ -5,6 +5,9 @@ const _config = {
   mongoURI: process.env.MONGO_CONNECTION_STRING,
   env: process.env.NODE_ENV,
   jwtsecret: process.env.JWT_SECRET,
+  cloudinaryCloud: process.env.CLOUDINARY_CLOUD,
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+  cloudinarySecret: process.env.CLOUDINARY_SECRET_KEY,
 };
 
 export const config = Object.freeze(_config);
